@@ -1,0 +1,235 @@
+{
+  "tool": "pip-audit",
+  "target": "/Users/teresapan/security-ai-agent",
+  "meta": {
+    "exit_code": 1,
+    "stderr": "Found 3 known vulnerabilities in 2 packages",
+    "args": [
+      "pip-audit",
+      "-f",
+      "json"
+    ],
+    "mode": "environment",
+    "requirements": null
+  },
+  "results": {
+    "dependencies": [
+      {
+        "name": "annotated-types",
+        "version": "0.7.0",
+        "vulns": []
+      },
+      {
+        "name": "boolean-py",
+        "version": "5.0",
+        "vulns": []
+      },
+      {
+        "name": "cachecontrol",
+        "version": "0.14.3",
+        "vulns": []
+      },
+      {
+        "name": "certifi",
+        "version": "2025.10.5",
+        "vulns": []
+      },
+      {
+        "name": "charset-normalizer",
+        "version": "3.4.3",
+        "vulns": []
+      },
+      {
+        "name": "click",
+        "version": "8.3.0",
+        "vulns": []
+      },
+      {
+        "name": "cyclonedx-python-lib",
+        "version": "9.1.0",
+        "vulns": []
+      },
+      {
+        "name": "defusedxml",
+        "version": "0.7.1",
+        "vulns": []
+      },
+      {
+        "name": "filelock",
+        "version": "3.20.0",
+        "vulns": []
+      },
+      {
+        "name": "idna",
+        "version": "3.10",
+        "vulns": []
+      },
+      {
+        "name": "license-expression",
+        "version": "30.4.4",
+        "vulns": []
+      },
+      {
+        "name": "markdown-it-py",
+        "version": "4.0.0",
+        "vulns": []
+      },
+      {
+        "name": "mdurl",
+        "version": "0.1.2",
+        "vulns": []
+      },
+      {
+        "name": "msgpack",
+        "version": "1.1.2",
+        "vulns": []
+      },
+      {
+        "name": "packageurl-python",
+        "version": "0.17.5",
+        "vulns": []
+      },
+      {
+        "name": "packaging",
+        "version": "25.0",
+        "vulns": []
+      },
+      {
+        "name": "pip",
+        "version": "25.2",
+        "vulns": [
+          {
+            "id": "GHSA-4xh5-x5gv-qwph",
+            "fix_versions": [],
+            "aliases": [
+              "CVE-2025-8869"
+            ],
+            "description": "### Summary  In the fallback extraction path for source distributions, `pip` used Python\u2019s `tarfile` module without verifying that symbolic/hard link targets resolve inside the intended extraction directory. A malicious sdist can include links that escape the target directory and overwrite arbitrary files on the invoking host during `pip install`.  ### Impact  Successful exploitation enables arbitrary file overwrite outside the build/extraction directory on the machine running `pip`. This can be leveraged to tamper with configuration or startup files and may lead to further code execution depending on the environment, but the direct, guaranteed impact is integrity compromise on the vulnerable system.  ### Conditions  The issue is triggered when installing an attacker-controlled sdist (e.g., from an index or URL) and the fallback extraction code path is used. No special privileges are required beyond running `pip install`; active user action is necessary.  ### Remediation  The [fix](https://github.com/pypa/pip/pull/13550), while available as a patch that can be manually applied, has not yet been put into a numbered version but is planned for `25.3`. Using a Python interpreter that implements the safe-extraction behavior described by **PEP 706** provides additional defense in depth for other `tarfile` issues but is not a substitute for upgrading pip for this specific flaw."
+          }
+        ]
+      },
+      {
+        "name": "pip-api",
+        "version": "0.0.34",
+        "vulns": []
+      },
+      {
+        "name": "pip-audit",
+        "version": "2.9.0",
+        "vulns": []
+      },
+      {
+        "name": "pip-requirements-parser",
+        "version": "32.0.1",
+        "vulns": []
+      },
+      {
+        "name": "platformdirs",
+        "version": "4.5.0",
+        "vulns": []
+      },
+      {
+        "name": "py-serializable",
+        "version": "2.1.0",
+        "vulns": []
+      },
+      {
+        "name": "pydantic",
+        "version": "2.12.0",
+        "vulns": []
+      },
+      {
+        "name": "pydantic-core",
+        "version": "2.41.1",
+        "vulns": []
+      },
+      {
+        "name": "pygments",
+        "version": "2.19.2",
+        "vulns": []
+      },
+      {
+        "name": "pyparsing",
+        "version": "3.2.5",
+        "vulns": []
+      },
+      {
+        "name": "requests",
+        "version": "2.32.5",
+        "vulns": []
+      },
+      {
+        "name": "rich",
+        "version": "14.2.0",
+        "vulns": []
+      },
+      {
+        "name": "security-ai-agent",
+        "skip_reason": "Dependency not found on PyPI and could not be audited: security-ai-agent (0.1.0)"
+      },
+      {
+        "name": "setuptools",
+        "version": "65.5.0",
+        "vulns": [
+          {
+            "id": "PYSEC-2022-43012",
+            "fix_versions": [
+              "65.5.1"
+            ],
+            "aliases": [
+              "CVE-2022-40897"
+            ],
+            "description": "Python Packaging Authority (PyPA) setuptools before 65.5.1 allows remote attackers to cause a denial of service via HTML in a crafted package or custom PackageIndex page. There is a Regular Expression Denial of Service (ReDoS) in package_index.py."
+          },
+          {
+            "id": "PYSEC-2025-49",
+            "fix_versions": [
+              "78.1.1"
+            ],
+            "aliases": [
+              "CVE-2025-47273",
+              "GHSA-5rjg-fvgr-3xxf"
+            ],
+            "description": "setuptools is a package that allows users to download, build, install, upgrade, and uninstall Python packages. A path traversal vulnerability in `PackageIndex` is present in setuptools prior to version 78.1.1. An attacker would be allowed to write files to arbitrary locations on the filesystem with the permissions of the process running the Python code, which could escalate to remote code execution depending on the context. Version 78.1.1 fixes the issue."
+          }
+        ]
+      },
+      {
+        "name": "shellingham",
+        "version": "1.5.4",
+        "vulns": []
+      },
+      {
+        "name": "sortedcontainers",
+        "version": "2.4.0",
+        "vulns": []
+      },
+      {
+        "name": "toml",
+        "version": "0.10.2",
+        "vulns": []
+      },
+      {
+        "name": "typer",
+        "version": "0.19.2",
+        "vulns": []
+      },
+      {
+        "name": "typing-extensions",
+        "version": "4.15.0",
+        "vulns": []
+      },
+      {
+        "name": "typing-inspection",
+        "version": "0.4.2",
+        "vulns": []
+      },
+      {
+        "name": "urllib3",
+        "version": "2.5.0",
+        "vulns": []
+      }
+    ],
+    "fixes": []
+  }
+}

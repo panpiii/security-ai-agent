@@ -1,0 +1,2 @@
+[console_scripts]
+sec-agent = secagent.agent:app
