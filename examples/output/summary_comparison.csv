@@ -1,0 +1,4 @@
+File,Dependency Vulnerabilities,Code Issues
+sample_combined.json,3,4
+sample_combined2.json,1,0
+sample_pip_only.json,0,0

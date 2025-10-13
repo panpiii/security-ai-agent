@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from secagent.tools.bandit_scan import run_bandit
+
+
 import json
 from pathlib import Path
 from typing import Optional
@@ -41,18 +44,53 @@ def scan(
     ),
 ):
     """
-    Run pip-audit and emit JSON (MVP).
+    Run pip-audit (deps) + Bandit (code) and emit a combined JSON report.
     """
     if not quiet:
-        console.print(Panel.fit("[bold]Security AI Agent[/bold] — pip-audit MVP", subtitle="scan"))
+        console.print(Panel.fit("[bold]Security AI Agent[/bold] — combined scan", subtitle="pip-audit + bandit"))
 
-    results, meta = run_pip_audit(target=target, requirements=requirements)
+    # --- pip-audit ---
+    pa_results_raw, pa_meta = run_pip_audit(target=target, requirements=requirements)
+    # normalize shape across pip-audit versions:
+    # some return list, some return {"dependencies":[...], "fixes":[...]}
+    if isinstance(pa_results_raw, dict):
+        pa_deps = pa_results_raw.get("dependencies", [])
+        pa_fixes = pa_results_raw.get("fixes", [])
+    else:
+        pa_deps = pa_results_raw
+        pa_fixes = []
 
+    # quick counts for convenience
+    pa_vuln_count = sum(len(d.get("vulns", [])) for d in pa_deps)
+
+    # --- Bandit ---
+    bandit_results, bandit_meta = run_bandit(target=target)
+    # bandit JSON has "results": [..] and "metrics": {...}
+    b_findings = bandit_results.get("results", []) if isinstance(bandit_results, dict) else []
+    b_issue_count = len(b_findings)
+
+    # --- Combined payload ---
     payload = {
-        "tool": "pip-audit",
+        "tool": "security-ai-agent",
         "target": str(target.resolve()),
-        "meta": meta,
-        "results": results,
+        "meta": {
+            "generated_by": "sec-agent",
+            "scanners": {
+                "pip_audit": {**pa_meta, "finding_count": pa_vuln_count},
+                "bandit":    {**bandit_meta, "finding_count": b_issue_count},
+            }
+        },
+        "results": {
+            "pip_audit": {
+                "dependencies": pa_deps,
+                "fixes": pa_fixes,
+            },
+            "bandit": bandit_results,
+        },
+        "summary": {
+            "dependency_vulnerabilities": pa_vuln_count,
+            "code_issues": b_issue_count,
+        }
     }
 
     data = json.dumps(payload, indent=2)
@@ -63,6 +101,11 @@ def scan(
             console.print(f"[green]Wrote JSON to {output}[/green]")
     else:
         typer.echo(data)
+
+    # exit code policy (MVP): non-zero if any findings
+    if pa_vuln_count > 0 or b_issue_count > 0:
+        raise typer.Exit(code=1)
+
 
 if __name__ == "__main__":
     app()
