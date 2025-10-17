@@ -42,6 +42,11 @@ def scan(
     quiet: bool = typer.Option(
         False, "--quiet", "-q", help="Suppress pretty console banners."
     ),
+    with_llm: bool = typer.Option(False, "--with-llm", help="Generate an LLM summary."),
+    llm_provider: str = typer.Option("openai", "--llm-provider", help="LLM provider: openai (default)."),
+    llm_model: str = typer.Option("gpt-4o-mini", "--llm-model", help="LLM model name."),
+    summary_format: str = typer.Option("md", "--summary-format", help="Summary format: md|json."),
+    summary_output: Optional[Path] = typer.Option(None, "--summary-output", help="Write LLM summary to a file."),
 ):
     """
     Run pip-audit (deps) + Bandit (code) and emit a combined JSON report.
@@ -101,6 +106,29 @@ def scan(
             console.print(f"[green]Wrote JSON to {output}[/green]")
     else:
         typer.echo(data)
+    # -- LLM summary (optional)
+    if with_llm:
+        try:
+            if llm_provider.lower() == "openai":
+                from secagent.summarizers.openai_summarizer import OpenAISummarizer
+                summarizer = OpenAISummarizer(model=llm_model)
+            else:
+                raise RuntimeError(f"Unsupported provider: {llm_provider}")
+
+            llm_text = summarizer.summarize(payload, out_format=summary_format)  # "md" or "json"
+
+            if summary_output:
+                summary_output.parent.mkdir(parents=True, exist_ok=True)
+                summary_output.write_text(llm_text, encoding="utf-8")
+                if not quiet:
+                    console.print(f"[green]Wrote LLM summary to {summary_output}[/green]")
+            else:
+                if not quiet:
+                    console.rule("[bold]LLM Summary[/bold]")
+                typer.echo(llm_text)
+        except Exception as e:
+            console.print(f"[yellow]LLM summary skipped: {e}[/yellow]")
+  
 
     # exit code policy (MVP): non-zero if any findings
     if pa_vuln_count > 0 or b_issue_count > 0:

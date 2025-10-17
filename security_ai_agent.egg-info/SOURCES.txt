@@ -1,11 +1,15 @@
 LICENSE
+README.md
 pyproject.toml
 secagent/__init__.py
 secagent/agent.py
 secagent/reporters/__init__.py
 secagent/summarizers/__init__.py
+secagent/summarizers/base.py
+secagent/summarizers/openai_summarizer.py
 secagent/tools/__init__.py
 secagent/tools/bandit_scan.py
+secagent/tools/compare_summaries.py
 secagent/tools/pip_audit.py
 security_ai_agent.egg-info/PKG-INFO
 security_ai_agent.egg-info/SOURCES.txt

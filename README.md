@@ -1,4 +1,5 @@
 # 🔒 Security AI Agent
+> 🧠 *A lightweight DevSecOps CLI that runs pip-audit + Bandit and summarizes security results with AI.*
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)]()
@@ -31,7 +32,7 @@ This tool automates early detection by integrating lightweight scans into your *
 | 🧱 Code scanning | Detects unsafe coding patterns with `Bandit` |
 | 🧾 JSON & Markdown output | Generates structured reports for humans or automation |
 | 🎨 Beautiful CLI | Built with `Typer` and `Rich` for modern UX |
-| 🧠 (Planned) AI summarization | Uses LLMs (OpenAI / Claude) to summarize and prioritize risks |
+| 🧠 AI summarization | Uses LLMs (OpenAI) to summarize and prioritize risks |
 | ⚙️ (Planned) FastAPI dashboard | Optional web view for scan history and reports |
 
 ---
@@ -134,6 +135,7 @@ sample_pip_only.json,0,0
 | combined2.json | 1|0	|After upgrading setuptools to >=78.1.1|
 | sample_pip_only.json	| 0 | 	—	| Scanning only project deps via -r requirements.txt|
 
+
 #### Remaining item: pip advisory (fix planned for version 25.3+). Re-run after upgrading pip when available.
 
 # 🧩 Example JSON Output (Trimmed)
@@ -160,11 +162,24 @@ This project uses `subprocess` to invoke scanners.
 Calls are **safe by design** (no shell, fixed argv).
 Low-severity Bandit rules (B404/B603) may appear as reminders; they’re explicitly justified with inline `# nosec `comments.
 
+### E) AI Summary (with mock provider for demos)
+
+Generate an ***AI-style Markdown summary*** (no API calls, perfect for screenshots or CI):
+```
+sec-agent scan --target secagent -o examples/output/combined.json \
+  --with-llm --llm-provider openai --llm-model gpt-4o-mini
+--summary-format md \
+  --summary-output examples/output/combined_llm.md
+```
+
+## AI Summary Preview (Mock Example)
+![AI Summary Preview](/security-ai-agent/assets/MockMDSummary%20.PNG)
+
 ### 🧭 Roadmap
 
 * ✅ MVP: Run pip-audit and Bandit, export combined JSON
 
-* 🔜 Integrate LLM summarizer (OpenAI / Claude)
+* ✅ Integrate LLM summarizer (Now: OpenAI)
 
 - 🔜 Add --scanners flag to toggle tools
 

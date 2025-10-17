@@ -296,7 +296,7 @@
     },
     "bandit": {
       "errors": [],
-      "generated_at": "2025-10-17T21:39:32Z",
+      "generated_at": "2025-10-17T21:25:00Z",
       "metrics": {
         "_totals": {
           "CONFIDENCE.HIGH": 4,
