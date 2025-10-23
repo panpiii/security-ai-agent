@@ -3,7 +3,15 @@ README.md
 pyproject.toml
 secagent/__init__.py
 secagent/agent.py
+secagent/dashboard/__init__.py
+secagent/dashboard/app.py
+secagent/database/__init__.py
+secagent/database/database.py
+secagent/database/models.py
+secagent/database/repository.py
 secagent/reporters/__init__.py
+secagent/scoring/__init__.py
+secagent/scoring/risk_calculator.py
 secagent/summarizers/__init__.py
 secagent/summarizers/base.py
 secagent/summarizers/openai_summarizer.py

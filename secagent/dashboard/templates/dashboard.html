@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Security AI Agent{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h2 mb-0">
+            <i class="fas fa-tachometer-alt me-2"></i>Security Dashboard
+        </h1>
+        <p class="text-muted">Overview of security scan results and risk trends</p>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-hover">
+            <div class="card-body text-center">
+                <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
+                <h3 class="card-title">{{ stats.total_scans }}</h3>
+                <p class="card-text text-muted">Total Scans</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-hover">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                <h3 class="card-title">{{ stats.recent_scans }}</h3>
+                <p class="card-text text-muted">Recent Scans (7 days)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-hover">
+            <div class="card-body text-center">
+                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                <h3 class="card-title">{{ stats.high_risk_scans }}</h3>
+                <p class="card-text text-muted">High Risk Scans</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-hover">
+            <div class="card-body text-center">
+                <i class="fas fa-bug fa-2x text-danger mb-2"></i>
+                <h3 class="card-title">{{ stats.critical_vulnerabilities }}</h3>
+                <p class="card-text text-muted">Critical Vulnerabilities</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Risk Trends
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="riskTrendsChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Risk Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="riskDistributionChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Scans -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>Recent Scans
+                </h5>
+                <a href="/api/scans" class="btn btn-outline-primary btn-sm">
+                    View All <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_scans %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Scan ID</th>
+                                <th>Target</th>
+                                <th>Risk Score</th>
+                                <th>Dependencies</th>
+                                <th>Code Issues</th>
+                                <th>Timestamp</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for scan in recent_scans %}
+                            <tr class="scan-item">
+                                <td>
+                                    <code class="small">{{ scan.scan_id[:8] }}...</code>
+                                </td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ scan.target_path }}">
+                                        {{ scan.target_path }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="risk-score {{ getRiskClass(scan.overall_risk_score) }}">
+                                        {{ scan.overall_risk_score }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if scan.dependency_vulnerabilities > 0 else 'success' }}">
+                                        {{ scan.dependency_vulnerabilities }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'warning' if scan.code_issues > 0 else 'success' }}">
+                                        {{ scan.code_issues }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ formatTimestamp(scan.scan_timestamp) }}</small>
+                                </td>
+                                <td>
+                                    {% if scan.success %}
+                                    <span class="badge bg-success">Success</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Failed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No scans found</h5>
+                    <p class="text-muted">Run your first security scan to see results here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Risk Trends Chart
+const trendsCtx = document.getElementById('riskTrendsChart').getContext('2d');
+const trendsChart = new Chart(trendsCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Overall Risk Score',
+            data: [],
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 10
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Risk Distribution Chart
+const distributionCtx = document.getElementById('riskDistributionChart').getContext('2d');
+const distributionChart = new Chart(distributionCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Low Risk', 'Medium Risk', 'High Risk', 'Critical Risk'],
+        datasets: [{
+            data: [0, 0, 0, 0], // Will be populated with actual data
+            backgroundColor: [
+                '#28a745',
+                '#ffc107',
+                '#fd7e14',
+                '#dc3545'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Load trend data
+async function loadTrendData() {
+    try {
+        const response = await fetch('/api/trends?days=30');
+        const trends = await response.json();
+        
+        const labels = trends.map(t => t.date);
+        const data = trends.map(t => t.overall_risk_score);
+        
+        trendsChart.data.labels = labels;
+        trendsChart.data.datasets[0].data = data;
+        trendsChart.update();
+    } catch (error) {
+        console.error('Error loading trend data:', error);
+    }
+}
+
+// Load distribution data
+async function loadDistributionData() {
+    try {
+        const response = await fetch('/api/scans?limit=100');
+        const scans = await response.json();
+        
+        let low = 0, medium = 0, high = 0, critical = 0;
+        
+        scans.forEach(scan => {
+            if (scan.overall_risk_score <= 3) low++;
+            else if (scan.overall_risk_score <= 6) medium++;
+            else if (scan.overall_risk_score <= 8) high++;
+            else critical++;
+        });
+        
+        distributionChart.data.datasets[0].data = [low, medium, high, critical];
+        distributionChart.update();
+    } catch (error) {
+        console.error('Error loading distribution data:', error);
+    }
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadTrendData();
+    loadDistributionData();
+});
+
+// Helper functions for template
+function getRiskClass(score) {
+    if (score <= 3) return 'risk-low';
+    if (score <= 6) return 'risk-medium';
+    if (score <= 8) return 'risk-high';
+    return 'risk-critical';
+}
+
+function formatTimestamp(timestamp) {
+    return new Date(timestamp).toLocaleString();
+}
+</script>
+{% endblock %}

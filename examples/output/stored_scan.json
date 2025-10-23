@@ -1,0 +1,235 @@
+{
+  "tool": "security-ai-agent",
+  "target": "/Users/teresapan/security-ai-agent",
+  "meta": {
+    "generated_by": "sec-agent",
+    "scanners": {
+      "pip_audit": {
+        "exit_code": 0,
+        "stderr": "No known vulnerabilities found",
+        "args": [
+          "pip-audit",
+          "-f",
+          "json",
+          "-r",
+          "requirements.txt"
+        ],
+        "mode": "requirements",
+        "requirements": "requirements.txt",
+        "finding_count": 0
+      },
+      "bandit": {
+        "exit_code": 1,
+        "args": [
+          "bandit",
+          "-r",
+          ".",
+          "-f",
+          "json"
+        ],
+        "stderr": "[main]\tINFO\tprofile include tests: None\n[main]\tINFO\tprofile exclude tests: None\n[main]\tINFO\tcli include tests: None\n[main]\tINFO\tcli exclude tests: None\n[manager]\tWARNING\tTest in comment: _lines is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: is is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: a is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: dict is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: of is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: line is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: number is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: set is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: of is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: tests is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: to is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: ignore is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: tkelsey is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: catching is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: expected is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: exception is not a test name or id, ignoring\n[tester]\tWARNING\tnosec encountered (B108), but no failed test on line 61\n[manager]\tWARNING\tTest in comment: c is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: B410 is not a test name or id, ignoring\n[manager]\tWARNING\tTest in comment: B320 is not a test name or id, ignoring",
+        "finding_count": 0
+      }
+    }
+  },
+  "results": {
+    "pip_audit": {
+      "dependencies": [
+        {
+          "name": "typer",
+          "version": "0.20.0",
+          "vulns": []
+        },
+        {
+          "name": "rich",
+          "version": "14.2.0",
+          "vulns": []
+        },
+        {
+          "name": "pygments",
+          "version": "2.19.2",
+          "vulns": []
+        },
+        {
+          "name": "pydantic",
+          "version": "2.12.3",
+          "vulns": []
+        },
+        {
+          "name": "pydantic-core",
+          "version": "2.41.4",
+          "vulns": []
+        },
+        {
+          "name": "sqlalchemy",
+          "version": "2.0.44",
+          "vulns": []
+        },
+        {
+          "name": "fastapi",
+          "version": "0.119.1",
+          "vulns": []
+        },
+        {
+          "name": "starlette",
+          "version": "0.48.0",
+          "vulns": []
+        },
+        {
+          "name": "anyio",
+          "version": "4.11.0",
+          "vulns": []
+        },
+        {
+          "name": "uvicorn",
+          "version": "0.38.0",
+          "vulns": []
+        },
+        {
+          "name": "jinja2",
+          "version": "3.1.6",
+          "vulns": []
+        },
+        {
+          "name": "python-multipart",
+          "version": "0.0.20",
+          "vulns": []
+        },
+        {
+          "name": "annotated-types",
+          "version": "0.7.0",
+          "vulns": []
+        },
+        {
+          "name": "click",
+          "version": "8.3.0",
+          "vulns": []
+        },
+        {
+          "name": "exceptiongroup",
+          "version": "1.3.0",
+          "vulns": []
+        },
+        {
+          "name": "h11",
+          "version": "0.16.0",
+          "vulns": []
+        },
+        {
+          "name": "idna",
+          "version": "3.11",
+          "vulns": []
+        },
+        {
+          "name": "markdown-it-py",
+          "version": "4.0.0",
+          "vulns": []
+        },
+        {
+          "name": "mdurl",
+          "version": "0.1.2",
+          "vulns": []
+        },
+        {
+          "name": "markupsafe",
+          "version": "3.0.3",
+          "vulns": []
+        },
+        {
+          "name": "shellingham",
+          "version": "1.5.4",
+          "vulns": []
+        },
+        {
+          "name": "sniffio",
+          "version": "1.3.1",
+          "vulns": []
+        },
+        {
+          "name": "typing-extensions",
+          "version": "4.15.0",
+          "vulns": []
+        },
+        {
+          "name": "typing-inspection",
+          "version": "0.4.2",
+          "vulns": []
+        },
+        {
+          "name": "httptools",
+          "version": "0.7.1",
+          "vulns": []
+        },
+        {
+          "name": "python-dotenv",
+          "version": "1.1.1",
+          "vulns": []
+        },
+        {
+          "name": "pyyaml",
+          "version": "6.0.3",
+          "vulns": []
+        },
+        {
+          "name": "uvloop",
+          "version": "0.22.1",
+          "vulns": []
+        },
+        {
+          "name": "watchfiles",
+          "version": "1.1.1",
+          "vulns": []
+        },
+        {
+          "name": "websockets",
+          "version": "15.0.1",
+          "vulns": []
+        }
+      ],
+      "fixes": []
+    },
+    "bandit": {
+      "error": "Failed to parse Bandit output"
+    }
+  },
+  "summary": {
+    "dependency_vulnerabilities": 0,
+    "code_issues": 0
+  },
+  "risk_score": {
+    "overall": 0.0,
+    "dependency": 0.0,
+    "code": 0.0,
+    "factors": {
+      "dependency_factors": {
+        "vulnerability_count": 0,
+        "critical_vulnerabilities": 0,
+        "high_vulnerabilities": 0,
+        "medium_vulnerabilities": 0,
+        "low_vulnerabilities": 0,
+        "available_fixes": 0,
+        "dependencies_scanned": 30
+      },
+      "code_factors": {
+        "total_findings": 0,
+        "severity_breakdown": {
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0
+        },
+        "confidence_breakdown": {
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0
+        },
+        "high_severity_issues": 0,
+        "medium_severity_issues": 0
+      },
+      "total_dependencies": 30,
+      "total_code_issues": 0
+    },
+    "recommendations": [
+      "\u2705 No immediate security concerns detected"
+    ]
+  }
+}

@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)]()
 [![Status](https://img.shields.io/badge/status-MVP-orange)]()
 
-A lightweight **DevSecOps command-line tool** that orchestrates open-source security scanners and (soon) uses AI to summarize findings into human-readable risk reports.
+A lightweight **DevSecOps command-line tool** that orchestrates open-source security scanners and uses AI to summarize findings into human-readable risk reports with an interactive dashboard.
 
 ---
 
@@ -16,7 +16,8 @@ A lightweight **DevSecOps command-line tool** that orchestrates open-source secu
 It runs open-source scanners and produces consolidated reports:
 - 🧩 [`pip-audit`](https://pypi.org/project/pip-audit/) — dependency vulnerability scanning  
 - 🧱 [`Bandit`](https://pypi.org/project/bandit/) — static code analysis for insecure coding patterns  
-- 🤖 *(Planned)* LLM summarizer — converts raw results into prioritized Markdown reports  
+- 🤖 **AI Risk Scoring** — automatic risk assessment with actionable recommendations
+- 📊 **Interactive Dashboard** — web interface for visualizing security trends and history  
 
 ### 💡 Why this project
 Modern teams ship fast, but often skip security checks until deployment.  
@@ -30,10 +31,12 @@ This tool automates early detection by integrating lightweight scans into your *
 |----------|-------------|
 | 🔍 Dependency scanning | Audits Python dependencies for known CVEs using `pip-audit` |
 | 🧱 Code scanning | Detects unsafe coding patterns with `Bandit` |
+| 🎯 **Automatic Risk Scoring** | AI-powered risk assessment (0-10 scale) with smart recommendations |
+| 📊 **Interactive Dashboard** | Web interface with charts, trends, and historical analysis |
+| 🗄️ **Database Storage** | Persistent scan history with project/branch tracking |
 | 🧾 JSON & Markdown output | Generates structured reports for humans or automation |
 | 🎨 Beautiful CLI | Built with `Typer` and `Rich` for modern UX |
 | 🧠 AI summarization | Uses LLMs (OpenAI) to summarize and prioritize risks |
-| ⚙️ (Planned) FastAPI dashboard | Optional web view for scan history and reports |
 
 ---
 
@@ -42,9 +45,11 @@ This tool automates early detection by integrating lightweight scans into your *
 - **Language:** Python 3.11+
 - **CLI Framework:** [Typer](https://typer.tiangolo.com/)
 - **UI Library:** [Rich](https://github.com/Textualize/rich)
+- **Web Framework:** [FastAPI](https://fastapi.tiangolo.com/) + [Uvicorn](https://www.uvicorn.org/)
+- **Database:** [SQLAlchemy](https://www.sqlalchemy.org/) (SQLite/PostgreSQL)
 - **Schema/Validation:** [Pydantic](https://docs.pydantic.dev/)
 - **Security Tools:** `pip-audit`, `Bandit`
-- **LLM Integration:** OpenAI / Anthropic APIs *(planned)*
+- **LLM Integration:** OpenAI / Anthropic APIs
 - **Use Case:** DevSecOps, Cloud, and Backend automation pipelines
 
 ---
@@ -109,7 +114,26 @@ Code issues: 0
 Target: /Users/teresapan/security-ai-agent
 ```
 
-### D) Compare multiple reports
+### D) 🎯 **NEW: Risk Scoring & Dashboard**
+
+**Run scan with automatic risk scoring:**
+```bash
+sec-agent scan --target . --store --project "my-app" --branch "main"
+```
+
+**Start the interactive dashboard:**
+```bash
+sec-agent dashboard
+# Visit http://localhost:8000
+```
+
+**Features:**
+- 🎯 **Automatic Risk Scoring** (0-10 scale)
+- 📊 **Interactive Dashboard** with charts and trends
+- 🗄️ **Database Storage** for historical analysis
+- 🤖 **AI Recommendations** for remediation
+
+### E) Compare multiple reports
 
 Generate a CSV comparing summaries across runs:
 ```

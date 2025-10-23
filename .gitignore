@@ -5,3 +5,21 @@ __pycache__/
 *.cache
 .env
 .DS_Store
+
+# Documentation files for personal use
+LINKEDIN_POST.md
+DASHBOARD_README.md
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
