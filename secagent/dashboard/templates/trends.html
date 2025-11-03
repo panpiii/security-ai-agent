@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Risk Trends - Security AI Agent{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h2 mb-0">
+            <i class="fas fa-chart-line me-2"></i>Risk Trends
+        </h1>
+        <p class="text-muted">Security risk trends over time</p>
+    </div>
+</div>
+
+<!-- Time Range Selector -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" action="/trends" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="days" class="form-label">Time Range</label>
+                        <select class="form-select" id="days" name="days" onchange="this.form.submit()">
+                            <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                            <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                            <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+                            <option value="365" {% if days == 365 %}selected{% endif %}>Last year</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-area me-2"></i>Risk Score Trend
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="riskTrendsChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Dependency Vulnerabilities
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="depVulnsChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Code Issues
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="codeIssuesChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trends Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-table me-2"></i>Trend Data
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if trends %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Avg Risk Score</th>
+                                <th>Dep Vulns</th>
+                                <th>Code Issues</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trend in trends %}
+                            <tr>
+                                <td>{{ trend.date }}</td>
+                                <td>
+                                    <span class="risk-score {{ getRiskClass(trend.overall_risk_score) }}">
+                                        {{ trend.overall_risk_score|round(2) }}
+                                    </span>
+                                </td>
+                                <td>{{ trend.dependency_vulnerabilities }}</td>
+                                <td>{{ trend.code_issues }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No trend data available</h5>
+                    <p class="text-muted">Run multiple scans to see trends over time.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+{% if trends %}
+const trendLabels = [{% for trend in trends %}'{{ trend.date }}'{% if not loop.last %},{% endif %}{% endfor %}];
+const trendScores = [{% for trend in trends %}{{ trend.overall_risk_score }}{% if not loop.last %},{% endif %}{% endfor %}];
+const trendDepVulns = [{% for trend in trends %}{{ trend.dependency_vulnerabilities }}{% if not loop.last %},{% endif %}{% endfor %}];
+const trendCodeIssues = [{% for trend in trends %}{{ trend.code_issues }}{% if not loop.last %},{% endif %}{% endfor %}];
+
+// Risk Trends Chart
+const trendsCtx = document.getElementById('riskTrendsChart').getContext('2d');
+const trendsChart = new Chart(trendsCtx, {
+    type: 'line',
+    data: {
+        labels: trendLabels,
+        datasets: [{
+            label: 'Overall Risk Score',
+            data: trendScores,
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 10
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Dependency Vulnerabilities Chart
+const depVulnsCtx = document.getElementById('depVulnsChart').getContext('2d');
+const depVulnsChart = new Chart(depVulnsCtx, {
+    type: 'bar',
+    data: {
+        labels: trendLabels,
+        datasets: [{
+            label: 'Dependency Vulnerabilities',
+            data: trendDepVulns,
+            backgroundColor: '#dc3545'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Code Issues Chart
+const codeIssuesCtx = document.getElementById('codeIssuesChart').getContext('2d');
+const codeIssuesChart = new Chart(codeIssuesCtx, {
+    type: 'bar',
+    data: {
+        labels: trendLabels,
+        datasets: [{
+            label: 'Code Issues',
+            data: trendCodeIssues,
+            backgroundColor: '#ffc107'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+{% endif %}
+</script>
+{% endblock %}
+

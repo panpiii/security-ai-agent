@@ -4,6 +4,7 @@ FastAPI dashboard for security scan visualization and management.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from datetime import datetime, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Query
@@ -25,9 +26,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Setup templates and static files
-templates = Jinja2Templates(directory="secagent/dashboard/templates")
-app.mount("/static", StaticFiles(directory="secagent/dashboard/static"), name="static")
+# Setup templates and static files with absolute paths
+# Get the directory where this file is located
+_dashboard_dir = Path(__file__).parent
+_template_dir = _dashboard_dir / "templates"
+_static_dir = _dashboard_dir / "static"
+
+templates = Jinja2Templates(directory=str(_template_dir))
+if _static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
 
 # Template helper functions
 def get_risk_class(score: float) -> str:
@@ -73,6 +80,55 @@ async def dashboard_home(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "stats": stats,
         "recent_scans": recent_scans,
+        "getRiskClass": get_risk_class,
+        "formatTimestamp": format_timestamp
+    })
+
+
+@app.get("/scans", response_class=HTMLResponse)
+async def scans_page(
+    request: Request,
+    limit: int = Query(50, ge=1, le=100),
+    project: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """HTML page showing all scans."""
+    repo = ScanRepository(db)
+    
+    if project:
+        scans = repo.get_scans_by_project(project, limit)
+    else:
+        scans = repo.get_recent_scans(limit)
+    
+    stats = repo.get_dashboard_stats()
+    
+    return templates.TemplateResponse("scans.html", {
+        "request": request,
+        "scans": scans,
+        "stats": stats,
+        "project_filter": project,
+        "limit": limit,
+        "getRiskClass": get_risk_class,
+        "formatTimestamp": format_timestamp
+    })
+
+
+@app.get("/trends", response_class=HTMLResponse)
+async def trends_page(
+    request: Request,
+    days: int = Query(30, ge=1, le=365),
+    db: Session = Depends(get_db)
+):
+    """HTML page showing risk trends."""
+    repo = ScanRepository(db)
+    trends = repo.get_risk_trends(days)
+    stats = repo.get_dashboard_stats()
+    
+    return templates.TemplateResponse("trends.html", {
+        "request": request,
+        "trends": trends,
+        "stats": stats,
+        "days": days,
         "getRiskClass": get_risk_class,
         "formatTimestamp": format_timestamp
     })
